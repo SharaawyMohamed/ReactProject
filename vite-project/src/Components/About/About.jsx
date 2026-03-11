@@ -1,8 +1,9 @@
 export function About(){
     return(
-        <div>
-            <h1>About</h1>
-            <p>This is the about page</p>
+        <div className="containter">
+            <div className='h-screen flex items-center justify-center'>
+                <h1 className='text-5xl font-bold'>Welcome to About  Page</h1>
+            </div>
         </div>      
     )
 }
