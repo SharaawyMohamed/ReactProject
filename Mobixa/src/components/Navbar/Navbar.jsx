@@ -4,7 +4,7 @@ import logo from '../../assets/logo.png'
 export default function Navbar() {
     return <header className="fixed w-full z-20 top-0 start-0 bg-gray-50">
         <nav className="bg-gray-300 fixed top-0 start-0 end-0">
-            <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
+            <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-5xl p-4">
                 <div className="flex items-center gap-5">
                     <NavLink to="https://flowbite.com" className="flex items-center space-x-3 rtl:space-x-reverse">
                         <img src={logo} className="h-7" alt="Flowbite Logo" />
