@@ -13,7 +13,7 @@ import Brands from './components/Brands/Brands'
 import Products from './components/Products/Products'
 import NotFound from './components/NotFound/NotFound'
 import Cart from './components/Cart/Cart'
-
+import AuthContext from './context/AuthContext'
 function App() {
   const [count, setCount] = useState(0)
 
@@ -34,7 +34,11 @@ function App() {
 
   ])
 
-  return <RouterProvider router={router} />
+  return (
+    <AuthContext>
+      <RouterProvider router={router} />
+    </AuthContext>
+  )
 }
 
 export default App

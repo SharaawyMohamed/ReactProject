@@ -5,12 +5,15 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import axios from 'axios'
 import * as Yup from 'yup'
+import {context} from '../../context/AuthContext'
 
 export default function Login() {
 
   //hooks
   const [errorApi, setErrorApi] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+    let userData = React.useContext(context);
+
   let navigate = useNavigate();
 
   // Yup validation schema
@@ -36,6 +39,9 @@ export default function Login() {
     let response = await axios.post('https://ecommerce.routemisr.com/api/v1/auth/signin', values)
       .then((response) => {
         console.log(response.data);
+        userData.setToken(response.data.token);
+        localStorage.setItem('Token', response.data.token);
+        navigate('/');
 
       }).catch((error) => {
         console.log(error);

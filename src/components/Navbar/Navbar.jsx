@@ -1,7 +1,20 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+
 import logo from '../../assets/logo.png'
+import { context } from '../../context/AuthContext'
+
 export default function Navbar() {
+    let userData = React.useContext(context);
+    let usenavigate = useNavigate();
+    
+    function logout() {
+        userData.setToken(null);
+        localStorage.removeItem('Token');
+        usenavigate('/login');
+    }
+
     return <header className="fixed w-full z-20 top-0 start-0 bg-gray-50">
         <nav className="bg-gray-300 fixed top-0 start-0 end-0">
             <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-5xl p-4">
@@ -10,28 +23,35 @@ export default function Navbar() {
                         <img src={logo} className="h-7" alt="Flowbite Logo" />
                         <span className="self-center text-xl text-heading font-semibold whitespace-nowrap">Flowbite</span>
                     </NavLink>
-
-                    <ul className="flex gap-5 ">
-                        <li><NavLink to="/" >Home</NavLink></li>
-                        <li><NavLink to="products" >Products</NavLink></li>
-                        <li><NavLink to="brands" >Brands</NavLink></li>
-                        <li><NavLink to="cart" >Cart</NavLink></li>
-
-                    </ul>
+                    {
+                        userData.Token ? <ul className="flex gap-5 ">
+                            <li><NavLink to="/" >Home</NavLink></li>
+                            <li><NavLink to="products" >Products</NavLink></li>
+                            <li><NavLink to="brands" >Brands</NavLink></li>
+                            <li><NavLink to="cart" >Cart</NavLink></li>
+                        </ul> : null
+                    }
                 </div>
                 <div className="flex items-center space-x-6 rtl:space-x-reverse">
-                    <ul className="flex items-center gap-5">
-                        <li><i className="fab fa-twitter"></i></li>
-                        <li><i className="fab fa-instagram"></i></li>
-                        <li><a href="https://www.linkedin.com/in/sharawymohamed/" target="_blank"><i className="fab fa-linkedin"></i></a></li>
-                        <li><a href="https://github.com/SharaawyMohamed/" target="_blank"><i className="fab fa-github"></i></a></li>
-                    </ul>
-                    <NavLink to="login" className="text-sm font-medium text-fg-brand hover:underline">Login</NavLink>
-                    <NavLink to="register" className="text-sm font-medium text-fg-brand hover:underline">Register</NavLink>
-                    <span className="text-sm font-medium text-fg-brand hover:underline">Logout</span>
+                    {
+                        userData.Token ? <ul className="flex items-center gap-5">
+                            <li><i className="fab fa-twitter"></i></li>
+                            <li><i className="fab fa-instagram"></i></li>
+                            <li><a href="https://www.linkedin.com/in/sharawymohamed/" target="_blank"><i className="fab fa-linkedin"></i></a></li>
+                            <li><a href="https://github.com/SharaawyMohamed/" target="_blank"><i className="fab fa-github"></i></a></li>
+                        </ul> : null
+                    }
+                    {
+                        userData.Token === null ? <><NavLink to="login" className="text-sm font-medium text-fg-brand hover:underline">Login</NavLink>
+                            <NavLink to="register" className="text-sm font-medium text-fg-brand hover:underline">Register</NavLink>
+                        </> : null
+                    }
+
+                    {
+                        userData.Token ? <span className="text-sm font-medium text-fg-brand hover:underline" onClick={logout}>Logout</span> : null
+                    }
 
                 </div>
-
             </div>
         </nav>
     </header>

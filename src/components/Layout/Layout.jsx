@@ -3,16 +3,22 @@ import { Outlet } from 'react-router-dom'
 
 import Navbar from '../../components/Navbar/Navbar'
 import Footer from '../../components/Footer/Footer'
+import CounterContextProvider from '../../context/CounterContextProvider'
 
 export default function Layout() {
     return (
-        <div className="min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-grow container mx-auto py-20 text-center">
-                <Outlet />
-            </main>
-            <Footer />
-        </div>
-    )
+        <CounterContextProvider>
+            <div className="flex flex-col min-h-screen">
 
+                <Navbar />
+                
+                <div className="flex-grow items-center">
+                    <Outlet />
+                </div>
+
+                <Footer />
+
+            </div>
+        </CounterContextProvider>
+    )
 }
