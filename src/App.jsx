@@ -15,6 +15,7 @@ import NotFound from './components/NotFound/NotFound'
 import Cart from './components/Cart/Cart'
 import AuthContext from './context/AuthContext'
 import ProtectedRouter from './components/ProtectedRouter/ProtectedRouter'
+import ProductDetails from './components/ProductDetails/ProductDetails'
 function App() {
   const [count, setCount] = useState(0)
 
@@ -28,6 +29,7 @@ function App() {
         { path: "Register", element: <Register /> },
         { path: "brands", element: <ProtectedRouter><Brands /></ProtectedRouter> },
         { path: "products", element: <ProtectedRouter><Products /></ProtectedRouter> },
+        { path: "productdetails/:id", element: <ProtectedRouter><ProductDetails /></ProtectedRouter> },
         { path: "cart", element: <ProtectedRouter><Cart /></ProtectedRouter> },
         { path: "*", element: <ProtectedRouter><NotFound /></ProtectedRouter> },
       ]

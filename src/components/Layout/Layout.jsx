@@ -9,15 +9,11 @@ export default function Layout() {
     return (
         <CounterContextProvider>
             <div className="flex flex-col min-h-screen">
-
                 <Navbar />
-                
-                <div className="flex-grow items-center">
+                <main className="flex-grow">
                     <Outlet />
-                </div>
-
+                </main>
                 <Footer />
-
             </div>
         </CounterContextProvider>
     )
