@@ -16,6 +16,7 @@ import Cart from './components/Cart/Cart'
 import AuthContext from './context/AuthContext'
 import ProtectedRouter from './components/ProtectedRouter/ProtectedRouter'
 import ProductDetails from './components/ProductDetails/ProductDetails'
+import Category from './components/Category/Category'
 function App() {
   const [count, setCount] = useState(0)
 
@@ -31,6 +32,7 @@ function App() {
         { path: "products", element: <ProtectedRouter><Products /></ProtectedRouter> },
         { path: "productdetails/:id", element: <ProtectedRouter><ProductDetails /></ProtectedRouter> },
         { path: "cart", element: <ProtectedRouter><Cart /></ProtectedRouter> },
+        { path: "category/:categoryId", element: <ProtectedRouter><Category /></ProtectedRouter> },
         { path: "*", element: <ProtectedRouter><NotFound /></ProtectedRouter> },
       ]
     }

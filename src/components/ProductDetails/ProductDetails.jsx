@@ -1,52 +1,127 @@
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+
 import axios from 'axios';
 
 export default function ProductDetails() {
     const { id } = useParams();
     const [productDetails, setProductDetails] = React.useState(null);
+    const [productImages, setProductImages] = React.useState([]);
     const [isLoading, setIsLoading] = React.useState(false);
-    
+
+    const [currentIndex, setCurrentIndex] = React.useState(0)
+
     async function getProductDetails() {
         setIsLoading(true);
-        await axios.get(`https://ecommerce.routemisr.com/api/v1/products/${id}`)
-            .then((response) => {
-                setProductDetails(response.data.data);
-            }).catch((error) => {
-                console.log("Error fetching details:", error);
-            }).finally(() => {
-                setIsLoading(false);
-            });
+        try {
+            const response = await axios.get(`https://ecommerce.routemisr.com/api/v1/products/${id}`);
+            setProductDetails(response.data.data);
+            setProductImages(response.data.data.images || []);
+            console.log("Details: ", response.data.data)
+        } catch (error) {
+            console.error("Error:", error);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     React.useEffect(() => {
         if (id) getProductDetails();
     }, [id]);
 
+    const nextImage = () => {
+        setCurrentIndex((prev) => (prev < productImages.length - 1 ? prev + 1 : prev));
+    };
+
+    const prevImage = () => {
+        setCurrentIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    };
+
     return (
-        <div className="container mx-auto pt-24 pb-12 px-4">
-            <div className="flex flex-col items-center bg-white p-6 border border-gray-200 rounded-lg shadow-md md:flex-row md:max-w-4xl mx-auto">
-                <img
-                    className="object-contain w-full rounded-lg h-64 md:h-auto md:w-80"
-                    src={productDetails?.imageCover}
-                    alt={productDetails?.title}
-                />
-                <div className="flex flex-col justify-between md:p-6 leading-normal">
-                    {/* FIXED: Using dynamic data instead of hardcoded text */}
-                    <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">
+        <div className="container mx-auto pt-24 pb-12 px-4 max-w-6xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 w-full bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden mx-auto">
+
+                <div className="relative md:col-span-1 bg-white-50/50 flex items-center justify-center group min-h-[400px]">
+                    <img
+                        className="object-contain w-full h-full p-8 mix-blend-multiply"
+                        src={productImages[currentIndex] || productDetails?.imageCover}
+                        alt={productDetails?.title}
+                    />
+
+                    {productImages.length > 1 && (
+                        <>
+                            <button
+                                disabled={currentIndex <= 0}
+                                onClick={prevImage}
+                                className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-2.5 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100 disabled:invisible"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
+                            </button>
+
+                            <button
+                                disabled={currentIndex >= productImages.length - 1}
+                                onClick={nextImage}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-2.5 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100 disabled:invisible"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" /></svg>
+                            </button>
+                        </>
+                    )}
+
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/70 backdrop-blur-sm text-gray-600 text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full border border-gray-100">
+                        {currentIndex + 1} / {productImages.length || 1}
+                    </div>
+                </div>
+
+                <div className="md:col-span-2 flex flex-col p-8 md:p-12 bg-white">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Link to={`/category/${productDetails?.category._id}`}>
+                            <span className="text-[11px] underline text-blue-600 uppercase tracking-wider">
+                                {productDetails?.category?.name}
+                            </span>
+                        </Link>
+                        <span className="text-gray-300">•</span>
+                        <span className="text-gray-500 text-xs font-medium italic">
+                            {productDetails?.brand.name}
+                        </span>
+                    </div>
+
+                    <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
                         {productDetails?.title}
-                    </h5>
-                    <p className="mb-6 text-gray-600">
+                    </h1>
+
+                    <p className="text-gray-500 text-lg leading-relaxed mb-10 max-w-xl">
                         {productDetails?.description}
                     </p>
 
-                    <div className="flex items-center justify-between mt-auto">
-                        <span className="text-xl font-bold text-emerald-600">{productDetails?.price} EGP</span>
-                        <button type="button" className="inline-flex items-center text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-xs px-4 py-2 transition-colors focus:outline-none">
-                            <svg className="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                            Add to cart
+                    <div className="mt-auto pt-8 border-t border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+
+                        <div className="flex flex-col">
+                            <span className="text-sm text-gray-400 font-medium mb-1">Total Price</span>
+                            <div className="flex items-baseline gap-3">
+                                {productDetails?.priceAfterDiscount ? (
+                                    <>
+                                        <span className="text-3xl font-black text-blue-600">
+                                            {productDetails?.priceAfterDiscount} <small className="text-sm">EGP</small>
+                                        </span>
+                                        <span className="text-l text-red-400 line-through decoration-red-400/50">
+                                            {productDetails?.price} EGP
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span className="text-3xl font-black text-gray-900">
+                                        {productDetails?.price} <small className="text-sm">EGP</small>
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        <button className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-12 rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                            Add to Cart
                         </button>
                     </div>
+
                 </div>
             </div>
         </div>
