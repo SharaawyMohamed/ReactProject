@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
-
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { Toaster } from 'react-hot-toast';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Layout from './components/Layout/Layout'
 import Home from './components/Home/Home'
@@ -13,11 +14,18 @@ import Brands from './components/Brands/Brands'
 import Products from './components/Products/Products'
 import NotFound from './components/NotFound/NotFound'
 import Cart from './components/Cart/Cart'
+
 import AuthContext from './context/AuthContext'
+import CartContextProvider from './context/CartContextProvider'
+
 import ProtectedRouter from './components/ProtectedRouter/ProtectedRouter'
 import ProductDetails from './components/ProductDetails/ProductDetails'
 import Category from './components/Category/Category'
-function App() {
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+let client = new QueryClient();
+
+export default function App() {
   const [count, setCount] = useState(0)
 
   const router = createBrowserRouter([
@@ -40,10 +48,15 @@ function App() {
   ])
 
   return (
-    <AuthContext>
-      <RouterProvider router={router} />
-    </AuthContext>
+    <QueryClientProvider client={client}>
+      <AuthContext>
+        <CartContextProvider>
+          <RouterProvider router={router} />
+          <Toaster />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </CartContextProvider>
+      </AuthContext>
+    </QueryClientProvider>
   )
 }
 
-export default App

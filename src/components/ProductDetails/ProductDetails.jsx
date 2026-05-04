@@ -1,28 +1,55 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-
 import axios from 'axios';
-
+import { useContext } from 'react';
+import { cartContext } from '../../context/CartContextProvider';
+import toast from 'react-hot-toast';
 export default function ProductDetails() {
     const { id } = useParams();
     const [productDetails, setProductDetails] = React.useState(null);
     const [productImages, setProductImages] = React.useState([]);
     const [isLoading, setIsLoading] = React.useState(false);
+    const [currentIndex, setCurrentIndex] = React.useState(0);
 
-    const [currentIndex, setCurrentIndex] = React.useState(0)
+    const {addToCart,res} = useContext(cartContext);
+
+    function addProductToCart(id) {
+        const response = addToCart(id);
+        if (response) {
+            toast.success("Product added to cart!", {
+                duration: 4000,
+                position: 'top-center',
+                style: {
+                    background: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    padding: '12px 20px',
+                    color: '#374151', 
+                    borderRadius: '12px',
+                    fontSize: '15px',
+                    fontWeight: '500',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)',
+                },
+                iconTheme: {
+                    primary: '#3B82F6', 
+                    secondary: '#FFFFFF',
+                },
+            });
+        } else {
+            toast.error("Failed to add product to cart. Please try again.");
+        }
+    }
 
     async function getProductDetails() {
         setIsLoading(true);
-        try {
-            const response = await axios.get(`https://ecommerce.routemisr.com/api/v1/products/${id}`);
-            setProductDetails(response.data.data);
-            setProductImages(response.data.data.images || []);
-            console.log("Details: ", response.data.data)
-        } catch (error) {
-            console.error("Error:", error);
-        } finally {
-            setIsLoading(false);
-        }
+        await axios.get(`https://ecommerce.routemisr.com/api/v1/products/${id}`)
+            .then((response) => {
+                setProductDetails(response.data.data);
+                setProductImages(response.data.data.images || []);
+            }).catch((error) => {
+                console.error("Error fetching product details:", error);
+            }).finally(() => {
+                setIsLoading(false);
+            });
     }
 
     React.useEffect(() => {
@@ -116,7 +143,9 @@ export default function ProductDetails() {
                             </div>
                         </div>
 
-                        <button className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-12 rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <button
+                            onClick={() => addProductToCart(productDetails.id)}
+                            className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-12 rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
                             Add to Cart
                         </button>

@@ -1,41 +1,75 @@
-import React, { useEffect } from 'react'
+import React, { use, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
+import { useQuery } from '@tanstack/react-query'
+import { useContext } from 'react'
+import { cartContext } from '../../context/CartContextProvider'
+import toast from 'react-hot-toast';
 
 export default function Products() {
-  const [products, setProducts] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(false);
 
-  useEffect(() => {
-    getProducts();
-  }, [])
+  const getProducts = async () => {
+    const { data } = await axios.get('https://ecommerce.routemisr.com/api/v1/products');
+    console.log("error: ", data.data);
+    return data.data;
+  }
 
-  async function getProducts() {
-    setIsLoading(true);
-
-    await axios.get('https://ecommerce.routemisr.com/api/v1/products')
-      .then((response) => {
-        setProducts(response.data.data);
-        console.log(response.data.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
+  let {addToCart,res} = useContext(cartContext);
+  function addProductToCart(id) {
+    const response = addToCart(id);
+    
+    if (response) {
+      toast.success("Product added to cart!", {
+        duration: 4000,
+        position: 'top-center',
+        style: {
+          background: '#FFFFFF',
+          border: '1px solid #E5E7EB',
+          padding: '12px 20px',
+          color: '#374151',
+          borderRadius: '12px',
+          fontSize: '15px',
+          fontWeight: '500',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)',
+        },
+        iconTheme: {
+          primary: '#3B82F6',
+          secondary: '#FFFFFF',
+        },
       });
+    } else {
+      toast.error("Failed to add product to cart. Please try again.");
+    }
+  }
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['products'],
+    queryFn: getProducts,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+    retry: 3,
+
+  });
+
+  if (isError) {
+    return <div className='text-center pt-24 text-red-500'>Error: {error.message}</div>
+  }
+
+  if (isLoading) {
+    return <div className="fixed inset-0 flex items-center justify-center bg-white/50 z-50">
+      <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  }
+
+  if (!data || data.length === 0) {
+    return <div className='text-center pt-24 text-gray-500'>No products found.</div>
   }
 
   return (
     <div className="container mx-auto pt-10 pb-12 px-4">
-      {isLoading ? (
-        <div className="fixed inset-0 flex items-center justify-center bg-white/50 z-50">
-          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      ) : null}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-10 items-stretch">
-        {products.map((product) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-6 gap-x-5 gap-y-10 items-stretch">
+        {data.map((product) => (
           <div key={product.id} className="group flex flex-col h-full bg-white p-5 border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300">
 
             <Link to={`/productdetails/${product.id}`} className="block mb-5">
@@ -97,6 +131,7 @@ export default function Products() {
                 <button
                   type="button"
                   className="inline-flex items-center justify-center text-white bg-blue-600 hover:bg-blue-700 w-9 h-9 sm:w-auto sm:px-4 rounded-xl transition-all active:scale-90 shadow-md shadow-blue-100"
+                  onClick={() => addProductToCart(product.id)}
                 >
                   <svg className="w-4 h-4 sm:me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
@@ -111,3 +146,4 @@ export default function Products() {
     </div>
   );
 }
+
