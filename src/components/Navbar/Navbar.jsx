@@ -1,59 +1,117 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
-
-import logo from '../../assets/logo.png'
-import { context } from '../../context/AuthContext'
+import React, { useContext } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import logo from '../../assets/logo.png';
+import { context } from '../../context/AuthContext';
 
 export default function Navbar() {
-    let userData = React.useContext(context);
-    let usenavigate = useNavigate();
-    
-    function logout() {
-        userData.setToken(null);
+    const { Token, setToken } = useContext(context);
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        setToken(null);
         localStorage.removeItem('Token');
-        usenavigate('/login');
-    }
+        navigate('/login');
+    };
 
-    return <header className="fixed w-full z-20 top-0 start-0 bg-gray-50">
-        <nav className="bg-gray-300 fixed top-0 start-0 end-0">
-            <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-5xl p-4">
-                <div className="flex items-center gap-5">
-                    <NavLink to="https://flowbite.com" className="flex items-center space-x-3 rtl:space-x-reverse">
-                        <img src={logo} className="h-7" alt="Flowbite Logo" />
-                        <span className="self-center text-xl text-heading font-semibold whitespace-nowrap">Flowbite</span>
-                    </NavLink>
-                    {
-                        userData.Token ? <ul className="flex gap-5 ">
-                            <li><NavLink to="/" >Home</NavLink></li>
-                            <li><NavLink to="products" >Products</NavLink></li>
-                            <li><NavLink to="brands" >Brands</NavLink></li>
-                            <li><NavLink to="cart" >Cart</NavLink></li>
-                        </ul> : null
-                    }
+    const navLinks = [
+        { to: '/', label: 'Home' },
+        { to: 'products', label: 'Products' },
+        { to: 'brands', label: 'Brands' },
+        { to: 'cart', label: 'Cart' }
+    ];
+
+    const socialLinks = [
+        { icon: 'fab fa-twitter', url: 'https://twitter.com' },
+        { icon: 'fab fa-instagram', url: 'https://instagram.com' },
+        { icon: 'fab fa-linkedin', url: 'https://www.linkedin.com/in/sharawymohamed/' },
+        { icon: 'fab fa-github', url: 'https://github.com/SharaawyMohamed/' }
+    ];
+
+    const getNavLinkClass = ({ isActive }) => 
+        `px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+            isActive 
+                ? 'text-blue-600 bg-blue-50' 
+                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
+        }`;
+
+    return (
+        <header className="fixed w-full z-50 top-0 bg-white shadow-md">
+            <nav className="bg-white border-b border-gray-200">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center h-16">
+                        {/* Logo and Brand */}
+                        <div className="flex items-center gap-8">
+                            <NavLink to="/" className="flex items-center space-x-3">
+                                <img src={logo} className="h-8 w-auto" alt="Logo" />
+                                <span className="text-xl font-bold text-gray-900">Flowbite</span>
+                            </NavLink>
+
+                            {/* Navigation Links - Only when logged in */}
+                            {Token && (
+                                <div className="hidden md:flex items-center space-x-1">
+                                    {navLinks.map((link) => (
+                                        <NavLink
+                                            key={link.to}
+                                            to={link.to}
+                                            className={getNavLinkClass}
+                                        >
+                                            {link.label}
+                                        </NavLink>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Right side content */}
+                        <div className="flex items-center space-x-4">
+                            {/* Social Links - Only when logged in */}
+                            {Token && (
+                                <div className="hidden md:flex items-center space-x-3">
+                                    {socialLinks.map((social, index) => (
+                                        <a
+                                            key={index}
+                                            href={social.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                                            aria-label={social.icon.split(' ')[1]}
+                                        >
+                                            <i className={`${social.icon} text-lg`}></i>
+                                        </a>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Auth Buttons */}
+                            <div className="flex items-center space-x-3">
+                                {!Token ? (
+                                    <>
+                                        <NavLink
+                                            to="/login"
+                                            className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors duration-200"
+                                        >
+                                            Login
+                                        </NavLink>
+                                        <NavLink
+                                            to="/register"
+                                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors duration-200"
+                                        >
+                                            Register
+                                        </NavLink>
+                                    </>
+                                ) : (
+                                    <button
+                                        onClick={handleLogout}
+                                        className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 transition-colors duration-200"
+                                    >
+                                        Logout
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div className="flex items-center space-x-6 rtl:space-x-reverse">
-                    {
-                        userData.Token ? <ul className="flex items-center gap-5">
-                            <li><i className="fab fa-twitter"></i></li>
-                            <li><i className="fab fa-instagram"></i></li>
-                            <li><a href="https://www.linkedin.com/in/sharawymohamed/" target="_blank"><i className="fab fa-linkedin"></i></a></li>
-                            <li><a href="https://github.com/SharaawyMohamed/" target="_blank"><i className="fab fa-github"></i></a></li>
-                        </ul> : null
-                    }
-                    {
-                        userData.Token === null ? <><NavLink to="login" className="text-sm font-medium text-fg-brand hover:underline">Login</NavLink>
-                            <NavLink to="register" className="text-sm font-medium text-fg-brand hover:underline">Register</NavLink>
-                        </> : null
-                    }
-
-                    {
-                        userData.Token ? <span className="text-sm font-medium text-fg-brand hover:underline" onClick={logout}>Logout</span> : null
-                    }
-
-                </div>
-            </div>
-        </nav>
-    </header>
-
+            </nav>
+        </header>
+    );
 }

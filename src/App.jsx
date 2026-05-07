@@ -14,7 +14,7 @@ import Brands from './components/Brands/Brands'
 import Products from './components/Products/Products'
 import NotFound from './components/NotFound/NotFound'
 import Cart from './components/Cart/Cart'
-
+import CashPayment from './components/CashPayment/CashPayment'
 import AuthContext from './context/AuthContext'
 import CartContextProvider from './context/CartContextProvider'
 
@@ -38,6 +38,7 @@ export default function App() {
         { path: "Register", element: <Register /> },
         { path: "brands", element: <ProtectedRouter><Brands /></ProtectedRouter> },
         { path: "products", element: <ProtectedRouter><Products /></ProtectedRouter> },
+        { path: "cashPayment/:cartId", element: <ProtectedRouter><CashPayment /></ProtectedRouter> },
         { path: "productdetails/:id", element: <ProtectedRouter><ProductDetails /></ProtectedRouter> },
         { path: "cart", element: <ProtectedRouter><Cart /></ProtectedRouter> },
         { path: "category/:categoryId", element: <ProtectedRouter><Category /></ProtectedRouter> },

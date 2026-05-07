@@ -51,12 +51,12 @@ export default function Login() {
       })
   }
 
+  if (errorApi) {
+    return <div className="p-4 mb-4 text-sm text-red-400 bg-red-100 rounded-l bg-danger-soft" role="alert">{errorApi}</div> 
+  }
 
   return (
     <div className='container'>
-      {
-        errorApi ? <div className="p-4 mb-4 text-sm text-red-400 bg-red-100 rounded-l bg-danger-soft" role="alert">{errorApi}</div> : null
-      }
       <div className="min-h-screen bg-gray-50 flex items-start justify-center p-6 pt-24">
         <div className="w-full max-w-lg bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
           <div className="text-center mb-8">
@@ -101,6 +101,5 @@ export default function Login() {
         </div>
       </div>
     </div>
-
   )
 }

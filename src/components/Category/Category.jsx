@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 export default function Category() {
     const { categoryId } = useParams();
 
-    const addToCart = useContext(cartContext);
+    const {addToCart,res} = useContext(cartContext);
     function addProductToCart(id) {
         const response = addToCart(id);
         if (response) {
