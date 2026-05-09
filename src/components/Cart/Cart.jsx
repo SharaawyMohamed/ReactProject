@@ -3,12 +3,15 @@ import axios from 'axios'
 import { cartContext } from '../../context/CartContextProvider'
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux';
+import { actions } from '../../Redux/basketSlice';
 
 export default function Cart() {
   const { queryResponse } = useContext(cartContext);
   const { data, isLoading, isError, error, refetch } = queryResponse;
   const [loadingId, setLoadingId] = useState(null);
   const [isClearing, setIsClearing] = useState(false)
+  const dispatch = useDispatch();
 
   async function updateItemQuantity(id, count) {
     setLoadingId(id);
@@ -56,7 +59,7 @@ export default function Cart() {
 
       if (response.data.status === "success") {
         const { data: updatedData } = await refetch();
-
+        dispatch(actions.decrement());
         toast.success("Item removed from cart!");
 
         console.log("Cart after removal:", updatedData?.data?.data);
@@ -79,13 +82,11 @@ export default function Cart() {
         }
       }
       );
-
-      if (response.data.status === "success") {
-        const { data: updatedData } = await refetch();
+      if (response.data.message === 'success') {
+        await refetch();
+        dispatch(actions.setCounter(0));
+        toast.success("Your basket had been cleard successfully")
       }
-
-      toast.success("Your basket had been cleard successfully")
-      console.log("Clear Response: ", response.data);
     }
     catch (err) {
       console.log("Error: ", err);
@@ -119,7 +120,7 @@ export default function Cart() {
 
   const cartProducts = data?.data?.data?.products || [];
   const totalCartPrice = data?.data?.data?.totalCartPrice || 0;
-  const cartId=data?.data?.cartId|| null;
+  const cartId = data?.data?.cartId || null;
   console.log('cart id: ', cartId);
   return (
     <div className='pt-10'>
@@ -237,13 +238,22 @@ export default function Cart() {
                   </div>
                 </div>
               </div>
+              {cartId ? (
+                <Link
+                  to={`/payment/${cartId}`}
+                  className="block w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center"
+                >
+                  Proceed to Checkout
+                </Link>
+              ) : (
+                <button
+                  disabled
+                  className="block w-full bg-gray-400 text-white py-3 rounded-lg font-semibold cursor-not-allowed text-center"
+                >
+                  Proceed to Checkout (Cart Empty)
+                </button>
+              )}
 
-              <Link
-                to={`/cashPayment/${cartId}`}
-                className="block w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center"
-              >
-                Proceed to Checkout
-              </Link>
             </div>
           </div>
         </div>

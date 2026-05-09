@@ -7,14 +7,16 @@ import CounterContextProvider from '../../context/CounterContextProvider'
 
 export default function Layout() {
     return (
-        <CounterContextProvider>
-            <div className="flex flex-col min-h-screen">
-                <Navbar />
-                <main className="flex-grow">
-                    <Outlet />
-                </main>
-                <Footer />
-            </div>
-        </CounterContextProvider>
+        
+            <CounterContextProvider>
+                <div className="flex flex-col min-h-screen">
+                    <Navbar />
+                    <main className="flex-grow">
+                        <Outlet />
+                    </main>
+                    <Footer />
+                </div>
+            </CounterContextProvider>
+
     )
 }

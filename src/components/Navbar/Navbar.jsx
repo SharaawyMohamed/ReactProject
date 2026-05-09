@@ -2,9 +2,11 @@ import React, { useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import { context } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
 
 export default function Navbar() {
     const { Token, setToken } = useContext(context);
+    const { counter } = useSelector((state) => state);
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -13,76 +15,124 @@ export default function Navbar() {
         navigate('/login');
     };
 
-    const navLinks = [
-        { to: '/', label: 'Home' },
-        { to: 'products', label: 'Products' },
-        { to: 'brands', label: 'Brands' },
-        { to: 'cart', label: 'Cart' }
-    ];
-
-    const socialLinks = [
-        { icon: 'fab fa-twitter', url: 'https://twitter.com' },
-        { icon: 'fab fa-instagram', url: 'https://instagram.com' },
-        { icon: 'fab fa-linkedin', url: 'https://www.linkedin.com/in/sharawymohamed/' },
-        { icon: 'fab fa-github', url: 'https://github.com/SharaawyMohamed/' }
-    ];
-
-    const getNavLinkClass = ({ isActive }) => 
-        `px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-            isActive 
-                ? 'text-blue-600 bg-blue-50' 
-                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
-        }`;
-
     return (
         <header className="fixed w-full z-50 top-0 bg-white shadow-md">
             <nav className="bg-white border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
-                        {/* Logo and Brand */}
+
                         <div className="flex items-center gap-8">
                             <NavLink to="/" className="flex items-center space-x-3">
                                 <img src={logo} className="h-8 w-auto" alt="Logo" />
                                 <span className="text-xl font-bold text-gray-900">Flowbite</span>
                             </NavLink>
 
-                            {/* Navigation Links - Only when logged in */}
                             {Token && (
                                 <div className="hidden md:flex items-center space-x-1">
-                                    {navLinks.map((link) => (
+                                    <NavLink
+                                        to="/"
+                                        className={({ isActive }) =>
+                                            `px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isActive
+                                                ? 'text-blue-600 bg-blue-50'
+                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
+                                            }`
+                                        }
+                                    >
+                                        Home
+                                    </NavLink>
+
+                                    <NavLink
+                                        to="products"
+                                        className={({ isActive }) =>
+                                            `px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isActive
+                                                ? 'text-blue-600 bg-blue-50'
+                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
+                                            }`
+                                        }
+                                    >
+                                        Products
+                                    </NavLink>
+
+                                    <NavLink
+                                        to="brands"
+                                        className={({ isActive }) =>
+                                            `px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isActive
+                                                ? 'text-blue-600 bg-blue-50'
+                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
+                                            }`
+                                        }
+                                    >
+                                        Brands
+                                    </NavLink>
+
+                                    <div className='relative flex items-center'>
+                                        <div className='absolute -top-2 -right-2 flex items-center justify-center bg-red-600 text-white text-[10px] font-bold rounded-full w-4 h-4 '>
+                                            {counter}
+                                        </div>
                                         <NavLink
-                                            key={link.to}
-                                            to={link.to}
-                                            className={getNavLinkClass}
+                                            to="cart"
+                                            className={({ isActive }) =>
+                                                `px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isActive
+                                                    ? 'text-blue-600 bg-blue-50'
+                                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
+                                                }`
+                                            }
+                                            title="Cart"
                                         >
-                                            {link.label}
+                                            <i className="fas fa-shopping-cart text-lg"></i>
+                                            <span className="sr-only">Cart</span>
                                         </NavLink>
-                                    ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
 
-                        {/* Right side content */}
                         <div className="flex items-center space-x-4">
-                            {/* Social Links - Only when logged in */}
+
                             {Token && (
                                 <div className="hidden md:flex items-center space-x-3">
-                                    {socialLinks.map((social, index) => (
-                                        <a
-                                            key={index}
-                                            href={social.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
-                                            aria-label={social.icon.split(' ')[1]}
-                                        >
-                                            <i className={`${social.icon} text-lg`}></i>
-                                        </a>
-                                    ))}
+                                    <a
+                                        href="https://twitter.com"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                                        aria-label="Twitter"
+                                    >
+                                        <i className="fab fa-twitter text-lg"></i>
+                                    </a>
+
+                                    <a
+                                        href="https://instagram.com"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                                        aria-label="Instagram"
+                                    >
+                                        <i className="fab fa-instagram text-lg"></i>
+                                    </a>
+
+                                    <a
+                                        href="https://www.linkedin.com/in/sharawymohamed/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                                        aria-label="LinkedIn"
+                                    >
+                                        <i className="fab fa-linkedin text-lg"></i>
+                                    </a>
+
+                                    <a
+                                        href="https://github.com/SharaawyMohamed/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                                        aria-label="GitHub"
+                                    >
+                                        <i className="fab fa-github text-lg"></i>
+                                    </a>
                                 </div>
                             )}
 
-                            {/* Auth Buttons */}
                             <div className="flex items-center space-x-3">
                                 {!Token ? (
                                     <>
@@ -108,6 +158,7 @@ export default function Navbar() {
                                     </button>
                                 )}
                             </div>
+
                         </div>
                     </div>
                 </div>

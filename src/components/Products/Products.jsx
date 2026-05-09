@@ -1,12 +1,15 @@
 import React, { use, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useContext } from 'react'
 import { cartContext } from '../../context/CartContextProvider'
 import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux'
 
 export default function Products() {
+  const queryClient = useQueryClient();
+  const { counter, nuser } = useSelector(state => state);
 
   const getProducts = async () => {
     const { data } = await axios.get('https://ecommerce.routemisr.com/api/v1/products');
@@ -14,11 +17,13 @@ export default function Products() {
     return data.data;
   }
 
-  let {addToCart,res} = useContext(cartContext);
-  function addProductToCart(id) {
-    const response = addToCart(id);
-    
-    if (response) {
+  let { addToCart, res } = useContext(cartContext);
+
+  async function addProductToCart(id) {
+    const isAdded = await addToCart(id);
+
+    if (isAdded) {
+      queryClient.invalidateQueries({ queryKey: ['cart'] })
       toast.success("Product added to cart!", {
         duration: 4000,
         position: 'top-center',
@@ -66,6 +71,7 @@ export default function Products() {
     return <div className='text-center pt-24 text-gray-500'>No products found.</div>
   }
 
+  console.log('Ccounter: ',counter);
   return (
     <div className="container mx-auto pt-10 pb-12 px-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-6 gap-x-5 gap-y-10 items-stretch">

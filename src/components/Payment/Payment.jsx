@@ -1,36 +1,75 @@
-import React, { useState } from 'react'
-import { useFormik } from 'formik'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Link } from 'react-router-dom'
-import axios from 'axios' // Fixed: lowercase axios
-import * as Yup from 'yup'
-import toast from 'react-hot-toast'
+import React, { useState } from 'react';
+import { useFormik } from 'formik';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import axios from 'axios';
+import * as Yup from 'yup';
+import toast from 'react-hot-toast';
 
-export default function CashPayment() {
-  const { cartId } = useParams(); 
+export default function Payment() {
+  const { cartId } = useParams();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [isCashPayment, setIsCashPayment] = useState(true);
 
   const validationSchema = Yup.object({
     shippingAddress: Yup.object({
-      details: Yup.string()
-        .required('Details is required')
-        .min(3, 'Details must be at least 3 characters'),
-
-      phone: Yup.string()
-        .required('Phone Number is required')
-        .matches(/^01[0125][0-9]{8}$/, 'Phone Number must be a valid Egyptian phone number'),
-      
-        city: Yup.string()
-        .required('City is Required')
-        .min(3, 'City must be at least 3 characters'),
-     
-        postalCode: Yup.string()
-        .required('Postal Code is required')
-        .length(5, "Postal Code Length should be 5 digits!")
+      details: Yup.string().required('Details is required').min(3, 'Details must be at least 3 characters'),
+      phone: Yup.string().required('Phone Number is required').matches(/^01[0125][0-9]{8}$/, 'Phone Number must be a valid Egyptian phone number'),
+      city: Yup.string().required('City is Required').min(3, 'City must be at least 3 characters'),
+      postalCode: Yup.string().required('Postal Code is required').length(5, "Postal Code Length should be 5 digits!")
     })
   });
 
+  async function handleCashPayment(values) {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        `https://ecommerce.routemisr.com/api/v1/orders/${cartId}`,
+        { shippingAddress: values.shippingAddress },
+        { headers: { token: localStorage.getItem('Token') } }
+      );
+
+      if (response.data.status === 'success') {
+        toast.success('Order placed successfully!');
+        navigate('/allorders');
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to place order');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleOnlinePayment(values) {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        `https://ecommerce.routemisr.com/api/v1/orders/checkout-session/${cartId}?url=${window.location.origin}`,
+        { shippingAddress: values.shippingAddress },
+        { headers: { token: localStorage.getItem('Token') } }
+      );
+      
+      if (response.data.status === 'success') {
+        // Redirect user to the Stripe/Payment gateway URL
+        window.location.href = response.data.session.url;
+      }
+    } catch (err) {
+      toast.error("Online payment initialization failed");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  // This function must stay INSIDE the Payment component
+  function handleFormSubmit(values) {
+    if (isCashPayment) {
+      handleCashPayment(values);
+    } else {
+      handleOnlinePayment(values);
+    }
+  }
+
+  // Formik must stay INSIDE the Payment component
   let formik = useFormik({
     initialValues: {
       shippingAddress: {
@@ -40,40 +79,11 @@ export default function CashPayment() {
         postalCode: ''
       }
     },
-    validationSchema: validationSchema, 
-    onSubmit: submitFormik
+    validationSchema: validationSchema,
+    onSubmit: handleFormSubmit
   });
 
-  async function submitFormik(values) {
-    setIsLoading(true);
-    try {
-      const response = await axios.post(
-        `https://ecommerce.routemisr.com/api/v1/orders/${cartId}`,
-        {
-          shippingAddress: values.shippingAddress
-        },
-        {
-          headers: {
-            token: localStorage.getItem('Token') // Fixed: added getItem
-          }
-        }
-      );
-      
-      console.log('Order response:', response.data);
-      
-      if (response.data.status === 'success') {
-        toast.success('Order placed successfully!');
-        // Navigate to order confirmation or home
-        navigate('/');
-      }
-    } catch (err) {
-      console.log('Error: ', err);
-      toast.error(err.response?.data?.message || 'Failed to place order');
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
+  // This return statement is now legally inside the function
   return (
     <div className='container mx-auto'>
       <div className="min-h-screen bg-gray-50 flex items-start justify-center p-6 pt-24">
@@ -84,7 +94,6 @@ export default function CashPayment() {
           </div>
           
           <form onSubmit={formik.handleSubmit} className="space-y-5">
-            {/* Details */}
             <div>
               <input
                 onBlur={formik.handleBlur}
@@ -96,13 +105,10 @@ export default function CashPayment() {
                 className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               />
               {formik.errors.shippingAddress?.details && formik.touched.shippingAddress?.details && (
-                <div className="p-2 mb-4 text-sm text-red-500 bg-red-50 rounded mt-2">
-                  {formik.errors.shippingAddress.details}
-                </div>
+                <div className="text-sm text-red-500 mt-1">{formik.errors.shippingAddress.details}</div>
               )}
             </div>
 
-            {/* Phone */}
             <div>
               <input
                 onBlur={formik.handleBlur}
@@ -114,13 +120,10 @@ export default function CashPayment() {
                 className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               />
               {formik.errors.shippingAddress?.phone && formik.touched.shippingAddress?.phone && (
-                <div className="p-2 mb-4 text-sm text-red-500 bg-red-50 rounded mt-2">
-                  {formik.errors.shippingAddress.phone}
-                </div>
+                <div className="text-sm text-red-500 mt-1">{formik.errors.shippingAddress.phone}</div>
               )}
             </div>
 
-            {/* City */}
             <div>
               <input
                 onBlur={formik.handleBlur}
@@ -132,13 +135,10 @@ export default function CashPayment() {
                 className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               />
               {formik.errors.shippingAddress?.city && formik.touched.shippingAddress?.city && (
-                <div className="p-2 mb-4 text-sm text-red-500 bg-red-50 rounded mt-2">
-                  {formik.errors.shippingAddress.city}
-                </div>
+                <div className="text-sm text-red-500 mt-1">{formik.errors.shippingAddress.city}</div>
               )}
             </div>
 
-            {/* Postal Code */}
             <div>
               <input
                 onBlur={formik.handleBlur}
@@ -150,22 +150,26 @@ export default function CashPayment() {
                 className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               />
               {formik.errors.shippingAddress?.postalCode && formik.touched.shippingAddress?.postalCode && (
-                <div className="p-2 mb-4 text-sm text-red-500 bg-red-50 rounded mt-2">
-                  {formik.errors.shippingAddress.postalCode}
-                </div>
+                <div className="text-sm text-red-500 mt-1">{formik.errors.shippingAddress.postalCode}</div>
               )}
             </div>
 
             <button
+              onClick={() => setIsCashPayment(true)}
               disabled={!formik.isValid || !formik.dirty || isLoading}
               type="submit"
               className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              {isLoading ? (
-                <i className='fas fa-spin fa-spinner'></i>
-              ) : (
-                'Place Order'
-              )}
+              {isLoading && isCashPayment ? <i className='fas fa-spin fa-spinner'></i> : 'Cash Payment'}
+            </button>
+
+            <button
+              onClick={() => setIsCashPayment(false)}
+              disabled={!formik.isValid || !formik.dirty || isLoading}
+              type="submit"
+              className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+            >
+              {isLoading && !isCashPayment ? <i className='fas fa-spin fa-spinner'></i> : 'Online Payment'}
             </button>
           </form>
 
@@ -176,4 +180,4 @@ export default function CashPayment() {
       </div>
     </div>
   );
-}
+} // <--- This closing brace was missing or misplaced!
