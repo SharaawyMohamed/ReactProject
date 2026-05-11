@@ -17,7 +17,7 @@ import Cart from './components/Cart/Cart'
 import Payment from './components/Payment/Payment'
 import AuthContext from './context/AuthContext'
 import CartContextProvider from './context/CartContextProvider'
-import {reduxStore} from './Redux/reduxStore'
+import { reduxStore } from './Redux/reduxStore'
 
 import ProtectedRouter from './components/ProtectedRouter/ProtectedRouter'
 import ProductDetails from './components/ProductDetails/ProductDetails'

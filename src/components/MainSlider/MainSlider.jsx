@@ -1,8 +1,12 @@
 import React from 'react'
 import SlickSlider from 'react-slick'
-import slide1 from '../../assets/images/slider-2.jpeg'
+import slide1 from '../../assets/images/first.jpg'
 import slide2 from '../../assets/images/slider-image-2.jpeg'
-import slide3 from '../../assets/images/slider-image-3.jpeg'
+import slide3 from '../../assets/images/third.jpg'
+import slide4 from '../../assets/images/slider-2.jpeg'
+import slide5 from '../../assets/images/second.jfif'
+import slide6 from '../../assets/images/slider-image-3.jpeg'
+import slide7 from '../../assets/images/forth.jfif'
 import grocery1 from '../../assets/images/grocery-banner.png'
 import grocery2 from '../../assets/images/grocery-banner-2.jpeg'
 
@@ -21,7 +25,7 @@ export default function MainSlider() {
   };
 
   return (
-    <div className='w-full container mx-auto py-10 px-4 pt-15 '>
+    <div className='w-full container mx-auto py-10 px-4 pt-22 '>
       <div className='grid grid-cols-1 md:grid-cols-7'>
 
         <div className='md:col-span-5'>
@@ -29,6 +33,10 @@ export default function MainSlider() {
             <img src={slide1} alt='slide1' className='w-full h-[300px] object-cover' />
             <img src={slide2} alt='slide2' className='w-full h-[300px] object-cover' />
             <img src={slide3} alt='slide3' className='w-full h-[300px] object-cover' />
+            <img src={slide4} alt='slide3' className='w-full h-[300px] object-cover' />
+            <img src={slide5} alt='slide3' className='w-full h-[300px] object-cover' />
+            <img src={slide6} alt='slide3' className='w-full h-[300px] object-cover' />
+            <img src={slide7} alt='slide3' className='w-full h-[300px] object-cover' />
           </Slider>
         </div>
 

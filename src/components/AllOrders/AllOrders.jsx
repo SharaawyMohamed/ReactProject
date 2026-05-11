@@ -26,7 +26,7 @@ export default function AllOrders() {
     }, [])
 
     return (
-        <div>AllOrders</div>
+        <div className='flex inline-flex pt-20 justify-center'>AllOrders</div>
     )
 }
 

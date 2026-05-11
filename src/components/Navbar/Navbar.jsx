@@ -24,7 +24,7 @@ export default function Navbar() {
                         <div className="flex items-center gap-8">
                             <NavLink to="/" className="flex items-center space-x-3">
                                 <img src={logo} className="h-8 w-auto" alt="Logo" />
-                                <span className="text-xl font-bold text-gray-900">Flowbite</span>
+                                <span className="text-xl font-bold text-gray-900">Covelo</span>
                             </NavLink>
 
                             {Token && (
@@ -66,9 +66,11 @@ export default function Navbar() {
                                     </NavLink>
 
                                     <div className='relative flex items-center'>
-                                        <div className='absolute -top-2 -right-2 flex items-center justify-center bg-red-600 text-white text-[10px] font-bold rounded-full w-4 h-4 '>
+                                        {counter ? <div className='absolute -top-2 -right-2 flex items-center justify-center bg-red-600 text-white text-[10px] font-bold rounded-full w-4 h-4 '>
                                             {counter}
-                                        </div>
+                                        </div> : null
+
+                                        }
                                         <NavLink
                                             to="cart"
                                             className={({ isActive }) =>

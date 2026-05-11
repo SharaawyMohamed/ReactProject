@@ -5,9 +5,11 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useContext } from 'react'
 import { cartContext } from '../../context/CartContextProvider'
 import toast from 'react-hot-toast';
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { actions } from '../../Redux/basketSlice'
 
 export default function Products() {
+
   const queryClient = useQueryClient();
   const { counter, nuser } = useSelector(state => state);
 
@@ -16,6 +18,8 @@ export default function Products() {
     console.log("error: ", data.data);
     return data.data;
   }
+
+ 
 
   let { addToCart, res } = useContext(cartContext);
 
@@ -73,7 +77,7 @@ export default function Products() {
 
   console.log('Ccounter: ',counter);
   return (
-    <div className="container mx-auto pt-10 pb-12 px-4">
+    <div className="container mx-auto pt-20 pb-12 px-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-6 gap-x-5 gap-y-10 items-stretch">
         {data.map((product) => (
           <div key={product.id} className="group flex flex-col h-full bg-white p-5 border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300">

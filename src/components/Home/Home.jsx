@@ -3,6 +3,7 @@ import HomeSlider from '../HomeSlider/HomeSlider';
 import MainSlider from '../MainSlider/MainSlider';
 
 export default function Home() {
+
   return (
     <>
       <MainSlider />
